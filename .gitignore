@@ -45,5 +45,5 @@ staticfiles/
 .DS_Store
 Thumbs.db
 
-# Docker
-*.pid
+# Dockerize
+*.pid 

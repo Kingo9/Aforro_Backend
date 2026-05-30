@@ -100,6 +100,54 @@ project/
 
 ---
 
+## Project Flow
+
+### Order Creation Flow
+
+Client
+→ POST /api/orders/
+→ Validate Request
+→ Validate Store
+→ Validate Products
+→ Start Database Transaction
+→ Lock Inventory Rows
+→ Check Stock Availability
+
+If stock is sufficient:
+
+→ Deduct Inventory
+→ Create Order (CONFIRMED)
+→ Create Order Items
+→ Trigger Celery Task
+→ Return Response
+
+Else:
+
+→ Create Order (REJECTED)
+→ No Inventory Deduction
+→ Return Response
+
+### Search Flow
+
+Client
+→ GET /api/search/products/
+→ Apply Keyword Search
+→ Apply Filters
+→ Apply Sorting
+→ Paginate Results
+→ Return Response
+
+### Autocomplete Flow
+
+Client
+→ GET /api/search/suggest/
+→ Redis Rate Limit Check
+→ Validate Query Length
+→ Search Product Titles
+→ Prioritize Prefix Matches
+→ Return Top 10 Suggestions
+
+
 ## Running with Docker
 
 ### Build and Start
@@ -424,6 +472,57 @@ Covered areas:
 * Validation logic
 
 ---
+
+## Assumptions & Design Decisions
+
+### Database Consistency
+
+Order creation is wrapped inside `transaction.atomic()` to ensure all inventory updates and order records are committed together or rolled back entirely.
+
+### Inventory Locking
+
+`select_for_update()` is used during order creation to prevent concurrent stock modifications and overselling.
+
+### Search Implementation
+
+Product search uses Django ORM filtering with `Q()` objects across:
+
+* Product title
+* Product description
+* Category name
+
+This approach was chosen for simplicity and maintainability while satisfying assignment requirements.
+
+### Rate Limiting
+
+Redis-backed rate limiting is applied to the autocomplete endpoint to prevent abuse and reduce unnecessary database load.
+
+### Asynchronous Processing
+
+Celery is used with Redis as the message broker to process order confirmation tasks asynchronously without blocking API responses.
+
+### Dockerized Development
+
+All services are containerized and started using Docker Compose:
+
+* Django API
+* PostgreSQL
+* Redis
+* Celery Worker
+
+This ensures consistent local development and deployment environments.
+
+### Query Optimization
+
+The project uses:
+
+* `select_related()`
+* `prefetch_related()`
+* `bulk_create()`
+* `in_bulk()`
+
+to minimize database queries and avoid N+1 query issues.
+
 
 ## Scalability Considerations
 
