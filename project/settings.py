@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'drf_spectacular',
     
     # Third party
     'rest_framework',
@@ -114,6 +115,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+    "DEFAULT_SCHEMA_CLASS":
+        "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -151,3 +154,9 @@ CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
 # Rate Limiting Configuration
 RATE_LIMIT_AUTOCOMPLETE = 20  # requests per minute
 RATE_LIMIT_WINDOW = 60  # seconds
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Aforro Backend API",
+    "DESCRIPTION": "Inventory and Order Management APIs",
+    "VERSION": "1.0.0",
+}

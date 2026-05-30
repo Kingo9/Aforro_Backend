@@ -6,6 +6,11 @@ from apps.products.views import CategoryViewSet, ProductViewSet
 from apps.stores.views import StoreViewSet
 from apps.orders.views import OrderViewSet
 from django.conf import settings
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
 
 router = DefaultRouter()
 
@@ -22,6 +27,28 @@ urlpatterns = [
 
     # Function-based views (search)
     path('api/', include('apps.search.urls')),
+
+    path(
+        "api/schema/",
+        SpectacularAPIView.as_view(),
+        name="schema"
+    ),
+
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(
+            url_name="schema"
+        ),
+        name="swagger-ui"
+    ),
+
+    path(
+        "api/redoc/",
+        SpectacularRedocView.as_view(
+            url_name="schema"
+        ),
+        name="redoc"
+    ),
 ]
 
 if settings.DEBUG:

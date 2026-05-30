@@ -20,7 +20,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    """Lightweight serializer for list views"""
+    
     category_name = serializers.CharField(source='category.name', read_only=True)
     
     class Meta:
