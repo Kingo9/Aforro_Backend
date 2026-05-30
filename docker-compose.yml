@@ -66,3 +66,5 @@ services:
 
 volumes:
   postgres_data:
+
+  # ""used to store data persistently""
